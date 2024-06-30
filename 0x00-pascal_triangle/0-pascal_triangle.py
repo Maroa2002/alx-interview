@@ -1,14 +1,16 @@
 #!/usr/bin/python3
 """
     Generating the Pascal's triangle
-    Args:
-        n: number of rows
-    return:
-        list of lists representing pascals triangle
 """
 
 
 def pascal_triangle(n):
+    """
+    Args:
+        n: number of rows
+    return:
+        list of lists representing pascals triangle
+    """
 
     if (n <= 0):
         return []  # return an empty list for non-positive n
