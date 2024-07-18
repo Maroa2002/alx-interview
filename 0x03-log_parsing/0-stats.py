@@ -1,71 +1,51 @@
 #!/usr/bin/python3
-""" 0-stats"""
+""" Log parsing """
 import sys
-# import re
-# import signal
-
-file_dict = {}
-file_size = 0
-line_size = 0
-status_code = 0
-count = 0
-
-valid_status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
-# pattern = re.compile(
-#     r'(?P<ip>\d{1,3}(?:\.\d{1,3}){3}) - '
-#     r'\[(?P<date>[^\]]+)\] '
-#     r'"GET /projects/260 HTTP/1\.1" '
-#     r'(?P<status_code>\d{3}) '
-#     r'(?P<size>\d+)'
-# )
 
 
-def print_stats():
-    """Print statistics"""
-    print("File size: {}".format(file_size))
-    for k, v in sorted(file_dict.items()):
-        print("{}: {}".format(k, v))
+def print_stats(total_size, status_codes):
+    """ Print statistics """
+    print("File size: {}".format(total_size))
+    for status_code in sorted(status_codes.keys()):
+        if status_codes[status_code] > 0:
+            print("{}: {}".format(status_code, status_codes[status_code]))
 
 
-# def signal_handler(sig, frame):
-#     """Handle keyboard interruption (CTRL + C)"""
-#     print_stats()
-#     sys.exit(0)
-#
-#
-# # signal handler for keyboard interruptions
-# signal.signal(signal.SIGINT, signal_handler)
+def parse_line(line):
+    """ Parse a line from the log """
+    try:
+        parts = line.split()
+        size = int(parts[-1])
+        code = int(parts[-2])
+        return (size, code)
+    except (ValueError, IndexError):
+        return (0, 0)
 
-try:
-    for line in sys.stdin:
-        line_split = line.strip().split(" ")
 
-        try:
-            status_code = int(line_split[-2])
-            line_size = int(line_split[-1])
-        except (IndexError, ValueError):
-            continue
+def main():
+    """ Main function """
+    total_size = 0
+    status_codes = {200: 0, 301: 0, 400: 0, 401: 0,
+                    403: 0, 404: 0, 405: 0, 500: 0}
+    count = 0
 
-        # match = pattern.match(line)
-        # if match:
-        #     data = match.groupdict()
-        #     status_code = int(data["status_code"])
-        #     line_size = int(data["size"])
+    try:
+        for line in sys.stdin:
+            size, code = parse_line(line)
+            total_size += size
+            if code in status_codes:
+                status_codes[code] += 1
+            count += 1
 
-            # update the total file size
-        file_size += line_size
+            if count % 10 == 0:
+                print_stats(total_size, status_codes)
 
-        if status_code in valid_status_codes:
-            if status_code not in file_dict:
-                file_dict[status_code] = 1
-            else:
-                file_dict[status_code] += 1
+    except KeyboardInterrupt:
+        print_stats(total_size, status_codes)
+        raise
 
-        count += 1
-        if count % 10 == 0:
-            print_stats()
-except KeyboardInterrupt:
-    print_stats()
-    raise
+    print_stats(total_size, status_codes)
 
-print_stats()
+
+if __name__ == "__main__":
+    main()
