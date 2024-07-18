@@ -1,18 +1,24 @@
 #!/usr/bin/python3
-""" Log parsing """
+"""
+Log parsing
+"""
 import sys
 
 
 def print_stats(total_size, status_codes):
-    """ Print statistics """
+    """
+    Print the stats of the log parsing
+    """
     print("File size: {}".format(total_size))
-    for status_code in sorted(status_codes.keys()):
-        if status_codes[status_code] > 0:
-            print("{}: {}".format(status_code, status_codes[status_code]))
+    for code in sorted(status_codes.keys()):
+        if status_codes[code] > 0:
+            print("{}: {}".format(code, status_codes[code]))
 
 
 def parse_line(line):
-    """ Parse a line from the log """
+    """
+    Parse a line from the log
+    """
     try:
         parts = line.split()
         size = int(parts[-1])
@@ -23,7 +29,9 @@ def parse_line(line):
 
 
 def main():
-    """ Main function """
+    """
+    Main function
+    """
     total_size = 0
     status_codes = {200: 0, 301: 0, 400: 0, 401: 0,
                     403: 0, 404: 0, 405: 0, 500: 0}
