@@ -25,34 +25,32 @@ def signal_handler(sid, frame):
     print_stats()
     sys.exit(0)
 
+
 # attach the signal handler for keyboard interruption
 signal.signal(signal.SIGINT, signal_handler)
 
-try:
-    for line in sys.stdin:
-        line_split = line.split(" ")
 
-        try:
-            status_code = int(line_split[-2])
-            line_size = int(line_split[-1])
-        except (IndexError, ValueError):
-            continue
+for line in sys.stdin:
+    line_split = line.split(" ")
 
-        # update the total file size
-        file_size += line_size
+    try:
+        status_code = int(line_split[-2])
+        line_size = int(line_split[-1])
+    except (IndexError, ValueError):
+        continue
 
-        if status_code in valid_status_codes:
-            if status_code not in file_dict:
-                file_dict[status_code] = 1
-            else:
-                file_dict[status_code] += 1
+    # update the total file size
+    file_size += line_size
 
-        count += 1
-        if count % 10 == 0:
-            print_stats()
+    if status_code in valid_status_codes:
+        if status_code not in file_dict:
+            file_dict[status_code] = 1
+        else:
+            file_dict[status_code] += 1
 
-except KeyboardInterrupt:
-    print_stats()
-    sys.exit(0)
+    count += 1
+    if count % 10 == 0:
+        print_stats()
+
 
 print_stats()
